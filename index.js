@@ -213,4 +213,4 @@ async function runProc() {
 //addBot('First', 1.01, 1.02, 1, true);
 runProc(); 
 //console.log(await getBotById(d)) 
-//console.log(orderStatus({id: 'G7iuDdGpTVMQ6AF9eL3JuFowGRbcGJ7ak7fpuH5wsZ5'}))
+//console.log(orderStatus({id: 'G7iuDdGpTVMQ6AF9eL3JuFowGRbcGJ7ak7fpuH5wsZ5'}))dd .
