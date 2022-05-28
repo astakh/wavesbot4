@@ -96,79 +96,6 @@ async function addDeal(botId) {
     return await deal.save();
 }
 
-
-let buyPrice    = 1.01500000;
-let sellPrice   = 1.0220000;
-let ammount     = 1;
-let ordBuy;
-let ordSell;
-let att         = 2;
-let ordStatus;
- 
-async function runBot(bot) {
-    let ordStatus;
-    let orderCurr   = '';
-    if (bot.stage == 0) { // start
-        console.log(`==== Bot ${bot.name} stage 0:`);
-        orderCurr = await placeOrder(bot.amountAsset, bot.priceAsset, bot.amount, parseInt(bot.priceIn * 10**8), 'buy');
-        ordStatus = await orderStatus(orderCurr);
-        if (ordStatus.exists){
-            //console.log('Run bot orderStatus.status: ' + ordStatus.status);
-            if (ordStatus.status == 'Accepted') {
-                console.log(`Buy order ${orderCurr.id} accepted`);
-                bot.stage = 1;
-                bot.orderInId = orderCurr.id;
-            }
-            if (ordStatus.status == 'Filled') {
-                console.log(`Buy order ${orderCurr.id} filled`);
-                bot.stage = 2;
-                bot.orderInId = orderCurr.id;
-            }
-        }
-    }
-    if (bot.stage == 1) { // buy accepted    
-        console.log(`==== Bot ${bot.name} stage 1:`);
-        ordStatus = await orderStatus({id: bot.orderInId});
-        if (ordStatus.status == 'Filled') {
-            console.log(`Buy order ${bot.orderInId} filled`);
-            bot.stage = 2;
-        }
-    }
-    if (bot.stage == 2) { // buy filled 
-        console.log(`==== Bot ${bot.name} stage 2:`);
-        orderCurr = await placeOrder(bot.amountAsset, bot.priceAsset, bot.amount, parseInt(bot.priceOut * 10**8), 'sell');
-        ordStatus = await orderStatus(orderCurr);
-        if (ordStatus.exists) {
-            if (ordStatus.status == 'Accepted') {
-                console.log(`Sell order ${orderCurr.id} Accepted`);
-                bot.stage = 3;
-                bot.orderOutId = orderCurr.id;
-            }
-            if (ordStatus.status == 'Filled') {
-                console.log(`Sell order ${orderCurr.id} Filled`);
-                bot.stage = 4;
-                bot.orderOutId = orderCurr.id;
-            }
-        }
-    }
-    if (bot.stage == 3) { // sell accepted    
-        console.log(`==== Bot ${bot.name} stage 3:`);
-        ordStatus = await orderStatus({id: bot.orderInId});
-        if (ordStatus.status == 'Filled') {
-            console.log(`Sell order ${bot.orderInId} filled`);
-            bot.stage = 4;
-        }
-    }
-    if (bot.stage == 4) { // sell filled    
-        console.log(`==== Bot ${bot.name} stage 4:`);
-        console.log(`Bot ${bot.name} deal complited`);
-        bot.stage       = 0;
-        bot.orderOutId  = '';
-        bot.orderInId   = '';
-    }
-    return bot;
-} 
-
 async function getBotDeals(botId) { return await Deal.find({botId: botId, finished: false}); }
 async function getDeals() { return await Deal.find({finished: false}); }
 async function getBots() { return await Bot.find({run: true}) }
@@ -203,7 +130,7 @@ async function workDeals() {
         bot = await getBotById(deal.botId);
         console.log(bot.name + ':');
         if (deal.stage == 0) {
-            order = await placeOrder(usdt, usdn, 1, parseInt(bot.priceIn * 10**8), 'buy');
+            order = await placeOrder(usdt, usdn, parseInt(bot.amount), parseInt(bot.priceIn * 10**8), 'buy');
             status = await orderStatus(order); 
             if (status.status == 'Accepted') {
                 dealToModify = await Deal.findById(deal._id);
@@ -234,7 +161,7 @@ async function workDeals() {
             }
         }
         if (deal.stage == 2) {
-            order   = await placeOrder(usdt, usdn, bot.amount, parseInt(bot.priceOut * 10**8), 'sell');
+            order   = await placeOrder(usdt, usdn, parseInt(bot.amount), parseInt(bot.priceOut * 10**8), 'sell');
             status  = await orderStatus(order); 
             if (status.status == 'Accepted') {
                 dealToModify = await Deal.findById(deal._id);
