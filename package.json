@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@waves/waves-transactions": "^4.2.5-beta.3",
+    "dotenv": "^16.0.1",
     "mongoose": "^6.3.4",
     "node-fetch": "^3.2.4",
     "waves": "^0.1.1"
